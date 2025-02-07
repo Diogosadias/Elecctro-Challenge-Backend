@@ -1,0 +1,40 @@
+{
+  "name": "elecctro-challenge-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diogosadias/Elecctro-Challenge-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Diogosadias/Elecctro-Challenge-Backend/issues"
+  },
+  "homepage": "https://github.com/Diogosadias/Elecctro-Challenge-Backend#readme",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.12",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/joi": "^17.1.1",
+    "@hapi/vision": "^7.0.3",
+    "hapi-swagger": "^17.3.2",
+    "knex": "^3.1.0",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@babel/core": "^7.26.7",
+    "@babel/eslint-parser": "^7.26.5",
+    "@hapi/eslint-plugin": "^7.0.0",
+    "eslint": "^9.19.0"
+  }
+}
