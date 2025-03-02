@@ -14,6 +14,7 @@ class TodoService {
      */
     async list(filter, orderBy) {
         try {
+
             let query = db('todos');
 
             // Aplica filtro
@@ -35,9 +36,16 @@ class TodoService {
                     query = query.orderBy('created_at', 'desc');
             }
 
-            return await query;
+            const results = await query;
+            return results;
         } catch (error) {
-            throw new Error(`Erro ao listar todos: ${error.message}`);
+            // Criando um objeto de erro mais estruturado
+            const customError = {
+                message: `Erro ao listar todos: ${error.message}`,
+                code: 'TODO_LIST_ERROR',
+                details: error
+            };
+            throw customError;
         }
     }
 

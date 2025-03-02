@@ -1,7 +1,6 @@
-//Dependencias
-import Joi from '@hapi/joi';
-//Controllers
-import {createTodo,listTodos} from '../controllers/todoController.js';
+// Dependências
+import Joi from 'joi';  
+import todoController from '../controllers/todoController.js';
 
 const routes = [
     {
@@ -14,11 +13,16 @@ const routes = [
             validate: {
                 payload: Joi.object({
                     description: Joi.string().min(3).max(255).required()
-                })
+                }),
+                failAction: (request, h, err) => {
+                    console.error('Erro de validação:', err.details);
+                    return h.response({ error: 'Payload inválido' }).code(400).takeover();
+                }
             }
         },
-        handler: createTodo
-    },{
+        handler: todoController.createTodo 
+    },
+    {
         method: 'GET',
         path: '/todos',
         options: {
@@ -32,8 +36,46 @@ const routes = [
                 })
             }
         },
-        handler: listTodos
-    }
+        handler: todoController.listTodos  
+    },
+    {
+        method: 'PATCH',
+        path: '/todo/{id}',
+        options: {
+          tags: ['api', 'todos'],
+          description: 'Editar uma tarefa existente',
+          notes: 'Edita a descrição ou estado de uma tarefa existente.',
+          validate: {
+            params: Joi.object({
+              id: Joi.string().required().description('ID da tarefa'),
+            }),
+            payload: Joi.object({
+              state: Joi.string().valid('COMPLETE', 'INCOMPLETE').optional(),
+              description: Joi.string().min(3).max(255).optional()
+            }).or('state', 'description'), 
+            failAction: (request, h, err) => {
+              console.error('Erro de validação:', err.details);
+              return h.response({ error: 'Payload inválido' }).code(400).takeover();
+            }
+          },
+          handler: todoController.updateTodo
+        }
+      },
+      {
+        method: 'DELETE',
+        path: '/todo/{id}',
+        options: {
+          tags: ['api', 'todos'],
+          description: 'Remover uma tarefa',
+          notes: 'Remove uma tarefa da lista.',
+          validate: {
+            params: Joi.object({
+              id: Joi.string().required().description('ID da tarefa')
+            })
+          },
+          handler: todoController.deleteTodoHandler
+        }
+      }
 ];
 
 export default routes;

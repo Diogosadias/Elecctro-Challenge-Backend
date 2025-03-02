@@ -4,11 +4,26 @@ import HapiSwagger from 'hapi-swagger';
 
 const swaggerOptions = {
     info: {
-        title: 'Elecctro-Challenge-Backend',
+        title: 'Elecctro-Challenge-Backend API',
         version: '1.0.0',
+        description: 'API para gerenciamento de tarefas (todos)',
+        contact: {
+            name: 'API Support'
+        }
     },
     documentationPath: '/docs',
     grouping: 'tags',
+    securityDefinitions: {
+        jwt: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header'
+        }
+    },
+    jsonPath: '/swagger.json',
+    swaggerUIPath: '/swagger',
+    basePath: '/',
+    schemes: ['http', 'https']
 };
 
 const swagger = {
@@ -27,3 +42,4 @@ const swagger = {
 };
 
 export default swagger;
+

@@ -9,9 +9,7 @@ const init = async () => {
         host: 'localhost',
         routes: {
             cors: {
-                origin: ['*'],
-                headers: ['Accept', 'Content-Type'],
-                additionalHeaders: ['X-Requested-With']
+                origin: ['*']
             }
         }
     });
@@ -21,6 +19,7 @@ const init = async () => {
     
     await server.start();
     console.log('Server running on %s', server.info.uri);
+    console.log('Documentação disponível em: %s/docs', server.info.uri);
 };
 
 process.on('unhandledRejection', (err) => {
