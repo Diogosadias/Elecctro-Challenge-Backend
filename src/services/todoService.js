@@ -1,4 +1,4 @@
-import knex from '../config/database.js';  
+import db from '../config/database.js';  
 
 class TodoService {
     constructor() {
@@ -14,7 +14,7 @@ class TodoService {
      */
     async list(filter, orderBy) {
         try {
-            let query = knex('todos');
+            let query = db('todos');
 
             // Aplica filtro
             if (filter !== 'ALL') {
@@ -49,7 +49,7 @@ class TodoService {
      */
     async create(todo) {
         try {
-            const [created] = await knex('todos')
+            const [created] = await db('todos')
                 .insert({
                     id: todo.id,
                     state: todo.state,
@@ -73,7 +73,7 @@ class TodoService {
      */
     async getById(id) {
         try {
-            const todo = await knex('todos')
+            const todo = await db('todos')
                 .where({ id })
                 .first();
             
@@ -92,7 +92,7 @@ class TodoService {
      */
     async update(id, updates) {
         try {
-            const [updated] = await knex('todos')
+            const [updated] = await db('todos')
                 .where({ id })
                 .update(updates)
                 .returning('*');
@@ -111,7 +111,7 @@ class TodoService {
      */
     async delete(id) {
         try {
-            await knex('todos')
+            await db('todos')
                 .where({ id })
                 .delete();
         } catch (error) {

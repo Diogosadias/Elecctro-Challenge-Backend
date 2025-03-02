@@ -1,5 +1,5 @@
-import Todo from '../models/Todo';
-import todoService from '../services/todoService';
+import Todo from '../models/Todo.js';
+import todoService from '../services/todoService.js';
 
 /**
  * Controlador para criar um novo item Todo
