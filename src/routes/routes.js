@@ -27,8 +27,8 @@ const routes = [
         path: '/todos',
         options: {
             tags: ['api', 'todos'],
-            description: 'Listar tarefas com filtros e ordenação',
-            notes: 'Retorna uma lista de tarefas filtradas e ordenadas conforme os parâmetros fornecidos',
+            description: 'List Todos with Filters & Ordenation',
+            notes: 'This route should list the to-do items considering the conditions imposed on the query parameters: filter & orderBy',
             validate: {
                 query: Joi.object({
                     filter: Joi.string().valid('ALL', 'COMPLETE', 'INCOMPLETE').default('ALL'),

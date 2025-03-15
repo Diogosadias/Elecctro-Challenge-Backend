@@ -23,7 +23,7 @@ const swaggerOptions = {
     jsonPath: '/swagger.json',
     swaggerUIPath: '/swagger',
     basePath: '/',
-    schemes: ['http', 'https']
+    schemes: ['http']
 };
 
 const swagger = {
