@@ -6,9 +6,19 @@ const swaggerOptions = {
     info: {
         title: 'Elecctro-Challenge-Backend API',
         version: '1.0.0',
-        description: 'API para gerenciamento de tarefas (todos)',
+        description: `
+            RESTful API for managing todo items. 
+            This API allows you to create, read, update and delete todo items, 
+            with support for filtering and sorting capabilities.
+        `,
         contact: {
-            name: 'API Support'
+            name: 'API Support',
+            email: 'diogodias1997@hotmail.com',
+            url: 'https://github.com/Diogosadias/Elecctro-Challenge-Backend'
+        },
+        license: {
+            name: 'MIT',
+            url: 'https://opensource.org/licenses/MIT'
         }
     },
     documentationPath: '/docs',
@@ -30,14 +40,20 @@ const swagger = {
     name: 'swagger',
     version: '1.0.0',
     register: async (server) => {
-        await server.register([
-            Inert,
-            Vision,
-            {
-                plugin: HapiSwagger,
-                options: swaggerOptions
-            }
-        ]);
+        try {
+            await server.register([
+                Inert,
+                Vision,
+                {
+                    plugin: HapiSwagger,
+                    options: swaggerOptions
+                }
+            ]);
+            console.log('Swagger documentation initialized');
+        } catch (error) {
+            console.error('Failed to initialize Swagger documentation:', error);
+            throw error;
+        }
     }
 };
 

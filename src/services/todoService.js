@@ -1,4 +1,7 @@
 import db from '../config/database.js';  
+import { validateUUID, validateTodoState } from '../utils/validators.js';
+import { TODO_STATES } from '../utils/constants.js';
+import { SORT_FIELDS } from '../utils/constants.js';
 
 class TodoService {
     constructor() {
@@ -14,38 +17,28 @@ class TodoService {
      */
     async list(filter, orderBy) {
         try {
-
             let query = db('todos');
-
-            // Aplica filtro
+            
             if (filter !== 'ALL') {
-                const state = filter === 'COMPLETE' ? 'COMPLETE' : 'INCOMPLETE';
-                query = query.where('state', state);
+                query = query.where('state', filter);
             }
 
-            // Aplica ordenação
-            switch (orderBy) {
-                case 'DESCRIPTION':
-                    query = query.orderBy('description', 'asc');
-                    break;
-                case 'COMPLETED_AT':
-                    query = query.orderBy('completed_at', 'desc', 'nulls_last');
-                    break;
-                case 'CREATED_AT':
-                default:
-                    query = query.orderBy('created_at', 'desc');
-            }
-
-            const results = await query;
+            const results = await this.applyOrdering(query, orderBy);
             return results;
         } catch (error) {
-            // Criando um objeto de erro mais estruturado
-            const customError = {
-                message: `Erro ao listar todos: ${error.message}`,
-                code: 'TODO_LIST_ERROR',
-                details: error
-            };
-            throw customError;
+            throw new AppError(`Erro ao listar todos: ${error.message}`);
+        }
+    }
+
+     async applyOrdering(query, orderBy) {
+        switch (orderBy) {
+            case SORT_FIELDS.DESCRIPTION:
+                return query.orderBy('description', 'asc');
+            case SORT_FIELDS.COMPLETED_AT:
+                return query.orderByRaw('completed_at DESC NULLS LAST');
+            case SORT_FIELDS.CREATED_AT:
+            default:
+                return query.orderBy('created_at', 'desc');
         }
     }
 
@@ -60,10 +53,10 @@ class TodoService {
             const [created] = await db('todos')
                 .insert({
                     id: todo.id,
-                    state: todo.state,
+                    state: 'INCOMPLETE',
                     description: todo.description,
-                    created_at: todo.createdAt,
-                    completed_at: todo.completedAt
+                    created_at: new Date(),
+                    completed_at: null
                 })
                 .returning('*');
 
@@ -81,6 +74,10 @@ class TodoService {
      */
     async getById(id) {
         try {
+            if (!validateUUID(id)) {
+                throw new Error('ID inválido: deve ser um UUID válido');
+            }
+
             const todo = await db('todos')
                 .where({ id })
                 .first();
@@ -96,18 +93,40 @@ class TodoService {
      * @async
      * @param {string} id - ID do Todo
      * @param {Object} updates - Campos a serem atualizados
-     * @returns {Promise<Todo>} Todo atualizado
+     * @returns {Promise<Todo|null|Object>} Todo atualizado, null se não encontrado, ou objeto de erro
+     * @throws {Error} Se houver erro na atualização ou validação
      */
     async update(id, updates) {
         try {
+            const todo = await this.getById(id);
+            
+            if (!todo) {
+                return null;
+            }
+
+            // Preparar dados para atualização
+            const updateData = {
+                ...updates,
+                // Atualizar completedAt apenas se o estado estiver mudando para COMPLETE
+                completed_at: updates.state === 'COMPLETE' ? new Date() : 
+                            updates.state === 'INCOMPLETE' ? null : 
+                            todo.completed_at
+            };
+
             const [updated] = await db('todos')
                 .where({ id })
-                .update(updates)
-                .returning('*');
+                .update(updateData)
+                .returning(['id', 'state', 'description', 'created_at', 'completed_at']);
 
-            return updated;
+            return {
+                id: updated.id,
+                state: updated.state,
+                description: updated.description,
+                createdAt: updated.created_at,
+                completedAt: updated.completed_at
+            };
         } catch (error) {
-            throw new Error(`Erro ao atualizar todo: ${error.message}`);
+            throw new Error(`Error updating todo: ${error.message}`);
         }
     }
 
@@ -115,13 +134,24 @@ class TodoService {
      * Remove um Todo
      * @async
      * @param {string} id - ID do Todo
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>} true se deletado, false se não encontrado
      */
     async delete(id) {
         try {
-            await db('todos')
+            if (!validateUUID(id)) {
+                return {
+                    isError: true,
+                    statusCode: 400,
+                    message: 'ID inválido: deve ser um UUID válido'
+                };
+            }
+
+            const deleted = await db('todos')
                 .where({ id })
-                .delete();
+                .delete()
+                .returning('*');
+            
+            return deleted.length > 0;
         } catch (error) {
             throw new Error(`Erro ao deletar todo: ${error.message}`);
         }

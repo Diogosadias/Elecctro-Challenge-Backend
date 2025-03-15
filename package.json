@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.js",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --config jest.config.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --config jest.config.js",
     "start": "node src/server.js"
   },
   "repository": {
@@ -34,8 +36,9 @@
   },
   "type": "module",
   "devDependencies": {
-    "@babel/core": "^7.26.7",
+    "@babel/core": "^7.26.10",
     "@babel/eslint-parser": "^7.26.5",
+    "@babel/preset-env": "^7.26.9",
     "@hapi/eslint-plugin": "^7.0.0",
     "eslint": "^9.19.0"
   }
